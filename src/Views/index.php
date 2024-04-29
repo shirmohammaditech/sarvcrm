@@ -42,7 +42,7 @@
 
 
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-  <form name="signin" method="POST" action="<?php echo base_url() . 'login'?>">
+  <form name="signin" method="POST" action="<?php echo base_url() . '/login'?>">
   <div class="mt-5 mb-3">
     <label for="email" class="form-label">Email</label>
     <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp">

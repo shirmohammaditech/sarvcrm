@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 session_start();
+//header("Content-Type: application/json");
 use App\Controller;
 use App\Models\ShoppingList;
 
@@ -19,37 +20,56 @@ class ShoppingListController extends Controller
         }
     }
 
-    public function signup()
+  
+    public function createList()
     {
-        $user_data = array(
-            'name' => $_POST['name'],
-            'email' => $_POST['email'],
-            'password' => md5($_POST['password'])
+        $list_data = array(
+            'title' => htmlspecialchars(trim($_POST['title'])),
+            'description' => htmlspecialchars(trim($_POST['description']))
         );
-        $user = new User();
-        $inserted_user = $user->save($user_data);
-        
+        $user_id = $_SESSION['id'];
+        $shopping_list = new shoppingList();
+        $inserted_list = $shopping_list->save($user_id, $list_data);
+        if ($inserted_list) {
+            $response = array (
+                'status' => true, //http status
+                'code' => 200, // error code
+                'message' => 'Success', // string message
+                'data' => $list_data
+            );
+            //http_response_code(200);
+            return json_encode($response);
+        } else {
+            $response = array (
+                'status' => false, //http status
+                'code' => 500, // error code
+                'message' => 'Error', // string message
+                'data' => null
+            );
+            header("Content-Type: application/json");
+            http_response_code(500);
+            return json_encode($response);
+        }
+
     }
 
-    public function login()
-    {
-        $user_login_data = array(
-            'email' => $_POST['email'],
-            'password' => md5($_POST['password'])
-        );
 
-        $user = new User();
-        $user = $user->get_by_login_data($user_login_data);
-        
-        if ($user) {
-            session_regenerate_id();
-            $_SESSION['loggedin'] = TRUE;
-            $_SESSION['name'] = $user->name;
-            $_SESSION['id'] = $user->id;
-            setcookie('session_id', session_id() , time()+3600 );
-        }
-        var_dump($user);
-        die();
-        
-    }    
+    public function editList()
+    {
+        $list_data = array(
+            'title' => $_POST['title'],
+            'description' => $_POST['description']
+        );
+        $id = $_POST['id']; 
+        $shopping_list = new shoppingList();
+        $updated_list = $shopping_list->update($id, $list_data);        
+    }
+
+    public function deleteList()
+    {
+        $id = $_POST['id']; 
+        $shopping_list = new shoppingList();
+        $deleted_list = $shopping_list->delete($id);                
+    }
+
 }

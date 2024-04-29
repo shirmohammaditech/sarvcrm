@@ -4,17 +4,12 @@ namespace App\Models;
 use Requtize\QueryBuilder\Connection;
 use Requtize\QueryBuilder\QueryBuilder\QueryBuilderFactory;
 use Requtize\QueryBuilder\ConnectionAdapters\PdoBridge;
-
+use App\Libraries\Database;
 class User {
     private $pdo;
 
     public function __construct() {
-        $db_config = get_config("Database");
-        $dsn = "mysql:dbname={$db_config['dbname']};host={$db_config['host']}";
-        $user = $db_config["user"];
-        $password = $db_config["password"];
-
-        $this->pdo = new \PDO($dsn, $user, $password);
+        $this->pdo = (new Database())->connet();
     }
 
     public function get_by_id($id) {
