@@ -112,13 +112,11 @@ $(document).ready(function () {
             dataType: 'json',
             data: list,
             success: function (result, status, xhr) {
-                console.log(result.data);
-		            creatDom(result.data);
+		            createDom(result.data);
 
 
             },
             error: function (xhr, status, error) {
-                console.log(xhr);
                 console.log(error);
             }
         });
@@ -129,6 +127,8 @@ $(document).ready(function () {
 
 function createDom(model) {
     if(model) {
+      $("#userLists").empty();
+      listsObject = [];
         for(let id in model) {
             if (!model.hasOwnProperty(id)) {
                 break;
