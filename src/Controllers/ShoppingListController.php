@@ -41,7 +41,6 @@ class ShoppingListController extends Controller
         http_response_code(200);
         
         echo json_encode($result);
-        //$this->render('lists', compact('user_lists'));            
 
     }
 
@@ -57,15 +56,31 @@ class ShoppingListController extends Controller
         $inserted_list = $shopping_list->save($user_id, $list_data);
         $list_data['id'] = $inserted_list;
         if ($inserted_list) {
+            //$list = new ShoppingList();
+            $user_lists = $shopping_list->get_by_user_id($_SESSION['id']);
+            $data = [];
+            foreach($user_lists as $index => $list) {
+                $data[$list->id] = $list;
+                unset($list);
+            }
+            $result = array(
+                'data' => $data
+            );
+            header("Content-Type: application/json");
+            http_response_code(200);
+            
+            echo json_encode($result);            
+            /*
             $response = array (
                 'status' => true, //http status
                 'code' => 200, // error code
                 'message' => 'Success', // string message
                 'data' => $list_data
             );
-            header("Content-Type: application/json");
+            
             http_response_code(200);
             echo json_encode($response);
+            */
         } else {
             $response = array (
                 'status' => false, //http status
