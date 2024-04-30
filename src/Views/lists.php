@@ -15,7 +15,12 @@
       New list
     </button>
   </div>
+  <div class="col-md-12" id="userLists">
+</div>
+
+  
   <?php 
+  /*
   if (count($user_lists)) {
     foreach($user_lists as $list){?>
       <div class="card m-1 p-1">
@@ -29,7 +34,7 @@
 }
   }
   
-  ?>
+  */?>
 </div>
 <div class="col-md-4"></div>
 </div>
@@ -76,28 +81,123 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
 
 <script>
+  let listsObject = new Array(); 
   $(document).ready(function () {
+
+    (function () {
+
+      
+      $.ajax({
+        url: '<?php echo base_url()?>' + '/user-lists',
+        type: 'POST',
+        dataType: 'json',
+        data: '',
+        success: function (result, status, xhr) {
+            if(result.data) {
+            for(let id in result.data) {
+            
+
+              if (!result.data.hasOwnProperty(id)) {
+                break;
+              }
+              
+
+let dom = $('<div>', {
+  class: 'card m-1 p-1',
+  id: `card-${id}`,
+  html: [
+    $('<p>', {
+    text: `${result.data[id].title}`
+    }),
+    $('<i>', {
+    text: `${result.data[id].description}`
+    }),
+        $('<div>', {
+        class: 'col-md-12',
+          html: [
+            $('<button>', {
+              class: 'btn btn-danger',
+    text: 'Delete'
+    }),
+    $('<button>', {
+      class: 'btn',
+    text: 'Edit'
+    })
+          ]
+    })
+  ]
+});
+listsObject.push(dom);
+          dom = null;
+
+
+            }
+            $("#userLists").append(listsObject);
+          }    
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr);
+          console.log(error);
+        }
+      });
+
+
+
+    })();    
+
     $("#createListButton").click(function () {
       var list = new Object();
       list.title = $('#createListTitle').val();
       list.description = $('#createListDescription').val();
       
       $.ajax({
-                     url: '<?php echo base_url()?>' + '/list/create',
-                     type: 'POST',
-                     dataType: 'json',
-                     data: list,
-                     success: function (data, textStatus, xhr) {
-                         console.log(data);
-                     },
-                     error: function (xhr, textStatus, errorThrown) {
-                         console.log('Error in Operation');
-                     }
-                 });
+        url: '<?php echo base_url()?>' + '/list/create',
+        type: 'POST',
+        dataType: 'json',
+        data: list,
+        success: function (result, status, xhr) {
+          console.log(result.data);
+          let insertedDom = $('<div>', {
+  class: 'card m-1 p-1',
+  id: `card-${result.data.id}`,
+  html: [
+    $('<p>', {
+      text: `${result.data.title}`
+    }),
+    $('<i>', {
+      text: `${result.data.description}`
+    }),
+    $('<div>', {
+      class: 'col-md-12',
+      html: [
+        $('<button>', {
+        class: 'btn btn-danger',
+        text: 'Delete'
+      }),
+      $('<button>', {
+        class: 'btn',
+        text: 'Edit'
+      })
+    ]
+  })
+]
+});
+listsObject.push(insertedDom);
+insertedDom = null;
+$("#userLists").prepend(listsObject);
 
-             });
-         });
-    </script>
+          
+
+        },
+        error: function (xhr, status, error) {
+          console.log(xhr);
+          console.log(error);
+        }
+      });
+
+  });
+});
+</script>
 
 
 </body>    
