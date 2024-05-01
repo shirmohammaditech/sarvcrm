@@ -2,9 +2,15 @@
 namespace App\Libraries;
 
 class Database {
-    private $dbConnection = null;
 
-    public function __construct() {
+    protected static $instance;
+  
+    protected function __construct() {}
+  
+    public static function getInstance() {
+  
+      if(empty(self::$instance)) {
+  
         $db_config = get_config("Database");
         $db = $db_config['dbname'];
         $host = $db_config['host'];
@@ -13,18 +19,18 @@ class Database {
         $port = $db_config["port"];
 
         try {
-            $this->dbConnection = new \PDO(
-                "mysql:host=$host;port=$port;dbname=$db",
-                $user,
-                $pass
-            );
-          } catch (\PDOException $e) {
-            exit($e->getMessage());
-          }
+          self::$instance = new \PDO(
+            "mysql:host=$host;port=$port;dbname=$db",
+            $user,
+            $pass
+          );
+  
+        } catch(PDOException $error) {
+          echo $error->getMessage();
         }
-      
-        public function connet()
-        {
-          return $this->dbConnection;
+  
+      }
+  
+      return self::$instance;
     }
 }

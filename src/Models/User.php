@@ -9,7 +9,7 @@ class User {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = (new Database())->connet();
+        $this->pdo = Database::getInstance();
     }
 
     public function get_by_id($id) {

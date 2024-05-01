@@ -2,32 +2,21 @@
 namespace App\Controllers;
 session_start();
 use App\Controller;
-use App\Models\ShoppingList;
+use App\Models\ListItem;
 
-class ShoppingListController extends Controller
+class ListItemController extends Controller
 {
-    public function index()
-    {
-        if (!isset($_SESSION['loggedin'])) {
-            header('Location: /');
-            exit;
-        } else {
-            $this->render('lists');
-        }
-    }
-
-    public function getUserLists()
+    public function getListItems()
     {
         if (!isset($_SESSION['loggedin'])) {
             header('Location: /');
             exit;
         } 
-        $list = new ShoppingList();
-        $user_lists = $list->get_by_user_id($_SESSION['id']);
+        $item = new ListItem();
+        $list_items = $item->get_by_shopping_list_id($_POST['shopping_list_id']);
         $data = [];
-        foreach($user_lists as $index => $list) {
-            $data[$list->id] = $list;
-            unset($list);
+        foreach($items as $index => $item) {
+            $data[$item->id] = $item;
         }
         $result = array(
             'data' => $data
@@ -40,18 +29,18 @@ class ShoppingListController extends Controller
     }
 
   
-    public function createList()
+    public function createItem()
     {
-        $list_data = array(
+        $item_data = array(
             'title' => htmlspecialchars(trim($_POST['title'])),
-            'description' => htmlspecialchars(trim($_POST['description']))
+            'description' => htmlspecialchars(trim($_POST['description'])),
+            'shopping_list_id' => htmlspecialchars(trim($_POST['shopping_list_id']))
         );
-        $user_id = $_SESSION['id'];
-        $shopping_list = new shoppingList();
-        $inserted_list = $shopping_list->save($user_id, $list_data);
-        $list_data['id'] = $inserted_list;
-        if ($inserted_list) {
-            $this->_updateUserLists();
+        $list_item = new ListItem();
+        $inserted_item = $list_item->save($item_data);
+        $item_data['id'] = $inserted_item;
+        if ($inserted_item) {
+            $this->_updateListItems();
         } else {
             $response = array (
                 'status' => false, //http status
@@ -67,17 +56,19 @@ class ShoppingListController extends Controller
     }
 
 
-    public function editList()
+    public function editItem()
     {
-        $list_data = array(
-            'title' => $_POST['title'],
-            'description' => $_POST['description']
+        $item_data = array(
+            'title' => htmlspecialchars(trim($_POST['title'])),
+            'description' => htmlspecialchars(trim($_POST['description'])),
+            'shopping_list_id' => htmlspecialchars(trim($_POST['shopping_list_id']))
         );
+
         $id = (int) $_POST['id']; 
-        $shopping_list = new shoppingList();
-        $updated_list = $shopping_list->update($id, $list_data);  
-        if (updated_list){
-            $this->_updateUserLists();        
+        $list_item = new ListItem();
+        $updated_item = $list_item->update($id, $item_data);  
+        if (updated_item){
+            $this->_updateListItems();        
         } else {
             $response = array (
                 'status' => false, //http status
@@ -91,13 +82,13 @@ class ShoppingListController extends Controller
         }              
     }
 
-    public function deleteList()
+    public function deleteItem()
     {
         $id = $_POST['id']; 
-        $shopping_list = new shoppingList();
-        $deleted_list = $shopping_list->delete($id);   
-        if ($deleted_list){
-            $this->_updateUserLists();        
+        $list_item = new listItem();
+$deleted_item = $list_item->delete($id);   
+        if ($deleted_item){
+            $this->_updateListItems();        
         } else {
             $response = array (
                 'status' => false, //http status
@@ -112,14 +103,14 @@ class ShoppingListController extends Controller
 
     }
 
-    private function _updateUserLists()
+    private function _updateListItems()
     {
         if (!isset($_SESSION['loggedin'])) {
             header('Location: /');
             exit;
         } 
-        $list = new ShoppingList();
-        $user_lists = $list->get_by_user_id($_SESSION['id']);
+        $item = new listItem();
+        $list_items = $item->get_by_list_id($shopping_list_id);
         $data = [];
         foreach($user_lists as $index => $list) {
             $data[$list->id] = $list;

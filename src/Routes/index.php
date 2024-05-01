@@ -18,4 +18,6 @@ $router->post('/list/create', ShoppingListController::class, 'createList');
 $router->post('/list/edit', ShoppingListController::class, 'editList');
 $router->post('/list/delete', ShoppingListController::class, 'deleteList');
 
+$router->get('/list-items', ShoppingListController::class, 'getListItems');
+
 $router->dispatch();

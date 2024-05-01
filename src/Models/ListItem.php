@@ -6,39 +6,39 @@ use Requtize\QueryBuilder\QueryBuilder\QueryBuilderFactory;
 use Requtize\QueryBuilder\ConnectionAdapters\PdoBridge;
 use App\Libraries\Database;
 
-class ShoppingList {
+class ListItem {
     private $pdo;
 
     public function __construct() {
         $this->pdo = Database::getInstance();  
     }
 
-    public function get_by_user_id($user_id) {
+    public function get_by_list_id($list_id) {
         $conn = new Connection(new PdoBridge($this->pdo));
         $qbf = new QueryBuilderFactory($conn);
-        $result = $qbf->from('shopping_lists')
-            ->where('user_id', '=', $user_id)
+        $result = $qbf->from('shopping_list_items')
+            ->where('shopping_list_id', '=', $list_id)
             ->all();
         return $result;
     }
 
-    public function save($user_id, $data) {
-        // Prepare and execute SQL query to insert list data
-        $data['user_id'] = $user_id;
+    public function save($shopping_list_id, $data) {
+        // Prepare and execute SQL query to insert list item data
+        $data['shopping_list_id'] = $shopping_list_id;
         $conn = new Connection(new PdoBridge($this->pdo));
         $qbf = new QueryBuilderFactory($conn);
-        $result = $qbf->insert($data, 'shopping_lists');
+        $result = $qbf->insert($data, 'shopping_list_items');
         return $result;
     }
 
     public function update($id, $data) {
-        // Prepare and execute SQL query to update list data
+        // Prepare and execute SQL query to update list item data
         $conn = new Connection(new PdoBridge($this->pdo));
         $qbf = new QueryBuilderFactory($conn);
         $result = $qbf
-        ->from('shopping_lists')
-        ->where('id', $id);
-        $result = $result->update($data);
+        ->from('shopping_list_items')
+        ->where('id', $id)
+        ->update($data);
         
         return $result;
     }
@@ -48,15 +48,9 @@ class ShoppingList {
         $conn = new Connection(new PdoBridge($this->pdo));
         $qbf = new QueryBuilderFactory($conn);
         $result = $qbf
-        ->from('shopping_lists')
+        ->from('shopping_list_items')
         ->where('id', $id)
         ->delete();
-
-        $delete_items = $qbf
-        ->from('shopping_list_items')
-        ->where('shopping_list_id', $id)
-        ->delete();
-
         return $result;
     }
 }

@@ -54,15 +54,15 @@
       </div>
       <div class="modal-body">
         
-      <form name="newList" method="POST" action="<?php echo base_url() . '/list/create'?>">
+      <form name="newList">
   <div class="mt-5 mb-3">
     <label for="title" class="form-label">Title</label>
-    <input type="text" name="title" id="createListTitle" class="form-control" id="title" aria-describedby="titleHelp">
+    <input type="text" name="createTitle" id="createListTitle" class="form-control" aria-describedby="titleHelp">
     <div id="titleHelp" class="form-text"></div>
   </div>
   <div class="mb-3">
     <label for="description" class="form-label">Description</label>
-    <input type="text" name="description" id="createListDescription" class="form-control" id="description1">
+    <input type="text" name="createDescription" id="createListDescription" class="form-control">
   </div>
 
 
@@ -70,6 +70,39 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" id="createListButton" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- New List Modal -->
+<div class="modal fade" id="editListModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit list</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+      <form name="editList">
+  <div class="mt-5 mb-3">
+    <label for="title" class="form-label">Title</label>
+    <input type="text" name="editTitle" id="editListTitle" class="form-control" aria-describedby="titleHelp">
+    <div id="titleHelp" class="form-text"></div>
+  </div>
+  <div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <input type="text" name="editDescription" id="editListDescription" class="form-control">
+  </div>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="editListButton" class="btn btn-primary">Save changes</button>
         </form>
       </div>
     </div>
@@ -113,6 +146,12 @@ $(document).ready(function () {
             data: list,
             success: function (result, status, xhr) {
 		            createDom(result.data);
+                let newListModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('newListModal'));
+                newListModal.hide();
+
+
+
+
 
 
             },
@@ -122,6 +161,34 @@ $(document).ready(function () {
         });
 
     });
+
+
+    $("#editListButton").click(function () {
+        var list = new Object();
+        list.id = $('#editListButton').data('id');
+        list.title = $('#editListTitle').val();
+        list.description = $('#editListDescription').val();
+
+        $.ajax({
+            url: '<?php echo base_url();?>' + '/list/edit',
+            type: 'POST',
+            dataType: 'json',
+            data: list,
+            success: function (result, status, xhr) {
+		        createDom(result.data);
+            let editListModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editListModal'));
+            editListModal.hide();
+
+
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+    });
+
+
 });
 
 
@@ -150,11 +217,11 @@ function createDom(model) {
                             $('<button>', {
                                 class: 'btn btn-danger',
                                 text: 'Delete'
-                            }),
+                            }).on('click', null, `${id}`, deleteList),
                             $('<button>', {
                                 class: 'btn',
                                 text: 'Edit'
-                            })
+                            }).on('click', null, [`${model[id].id}`, `${model[id].title}`, `${model[id].description}`], editList)
                         ]
                     })
                 ]
@@ -165,8 +232,40 @@ function createDom(model) {
         $("#userLists").append(listsObject);
     }
 }  
+function deleteList(param)
+{
+  var list = new Object();
+  list.id = param.data;
+
+        $.ajax({
+            url: '<?php echo base_url()?>' + '/list/delete',
+            type: 'POST',
+            dataType: 'json',
+            data: list,
+            success: function (result, status, xhr) {
+		            createDom(result.data);
+
+
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+
+
+        
+}
+
+function editList(param)
+{
+  console.log(param.data[1]);
+  let editListModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editListModal'));
+  editListModal.show();
+  $('#editListTitle').val(param.data[1]);
+  $('#editListDescription').val(param.data[2]);
+  $('#editListButton').data('id', param.data[0]);
+}
+
 </script>
-
-
 </body>    
 </html>
